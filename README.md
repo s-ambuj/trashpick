@@ -87,27 +87,6 @@ Before you get started, follow these requirements
 - Cloud Firestore - https://pub.dev/packages/cloud_firestore
 - Cloud Storage - https://pub.dev/packages/firebase_storage
 
-## 🖼️ Project Gallery
-
-Project screenshots and pictures - [Click here to view](https://www.figma.com/file/p9IcDzJLcYuoYnkSShFrUp/TrashPick---Mobile-App-UI?node-id=0%3A1)
-
-## ❤️ Thanks
-
-Thanks to everyone who supported
-
-## 👨‍💻 Developed By
-
-Dileepa Bandara  
-©dileepabandara.dev  
-<https://dileepabandara.dev>
-
-## 💬 Contact
-
-If you want to contact me, leave a message via email or Twitter
-
-- Email - <contact.dileepabandara@gmail.com>
-- Twitter - [_dileepabandara](https://twitter.com/_dileepabandara)
-
 ## 📜 License
 
 This project is licensed under the MIT License  
