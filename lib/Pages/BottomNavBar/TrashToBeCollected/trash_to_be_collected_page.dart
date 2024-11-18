@@ -30,7 +30,6 @@ class _TrashToBeCollectedState extends State<TrashToBeCollected> {
   @override
   void initState() {
     _childMap = loadingMap("Loading Map...");
-    //checkLocationPermission();
     _getCurrentUserLocation();
     setCurrentUserMarkerIcon();
     setMapRecyclingCentersMarkerIcon();
@@ -123,12 +122,6 @@ class _TrashToBeCollectedState extends State<TrashToBeCollected> {
             querySnapshot.docs.forEach((result) {
               TrashPickUpsModel trashPickUpsModel =
                   TrashPickUpsModel.fromDocument(result);
-              print(
-                  "--------------------- Recycling Center ---------------------\n"
-                  "id: ${trashPickUpsModel.trashID}\n"
-                  "name: ${trashPickUpsModel.trashName}\n"
-                  "latitude: ${trashPickUpsModel.trashLocationLocation.latitude}\n"
-                  "longitude: ${trashPickUpsModel.trashLocationLocation.longitude}");
               setRecyclingCentersMarkers(
                 trashPickUpsModel.trashID,
                 trashPickUpsModel.trashName,
@@ -156,16 +149,6 @@ class _TrashToBeCollectedState extends State<TrashToBeCollected> {
       infoWindow: InfoWindow(
           title: name,
           onTap: () {
-            /*showModalBottomSheet<void>(
-              context: context,
-              builder: (BuildContext context) {
-                return MarkerDetailsCard().showEventDetails(
-                    id,
-                    name,
-                    location
-                    context);
-              },
-            );*/
             print("id: $id\n"
                 "name:$name\n"
                 "latitude: $latitude\n"
@@ -176,7 +159,6 @@ class _TrashToBeCollectedState extends State<TrashToBeCollected> {
       recyclingCentersMarkers[markerID] = marker;
       _displayMapMarkers = Set<Marker>.of(recyclingCentersMarkers.values);
       _childMap = mapWidget();
-      //print("Recycling Center MarkerID: $markerID");
     });
   }
 
@@ -203,7 +185,6 @@ class _TrashToBeCollectedState extends State<TrashToBeCollected> {
       await Geolocator.openLocationSettings();
     } else {
       _getCurrentUserLocation();
-      //ToastMessages().toastInfo("Location Permission Granted!");
     }
   }
 
@@ -230,24 +211,29 @@ class _TrashToBeCollectedState extends State<TrashToBeCollected> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+          backgroundColor: Color(0xFFB2EBF2), // Light aqua color
           automaticallyImplyLeading: false,
           title: Text(
             "Trash To Be Collected",
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context)
+                .textTheme
+                .headline6
+                .copyWith(color: Colors.black),
           ),
-          elevation: Theme.of(context).appBarTheme.elevation,
+          elevation: 2.0,
           actions: <Widget>[
             Padding(
               padding: const EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
               child: Icon(
                 Icons.transfer_within_a_station_rounded,
-                color: AppThemeData().secondaryColor,
+                color: Color(0xFF00796B), // Darker aqua for icons
                 size: 35.0,
               ),
             )
           ],
           bottom: TabBar(
+            labelColor: Color(0xFF00796B), // Darker aqua for selected tab
+            unselectedLabelColor: Colors.black,
             tabs: [
               Tab(
                 child: Row(
@@ -259,7 +245,7 @@ class _TrashToBeCollectedState extends State<TrashToBeCollected> {
                     ),
                     Icon(
                       Icons.list_alt_rounded,
-                      color: Theme.of(context).iconTheme.color,
+                      color: Color(0xFF00796B),
                     ),
                   ],
                 ),
@@ -272,8 +258,7 @@ class _TrashToBeCollectedState extends State<TrashToBeCollected> {
                       "Map View",
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
-                    Icon(Icons.map_rounded,
-                        color: Theme.of(context).iconTheme.color),
+                    Icon(Icons.map_rounded, color: Color(0xFF00796B)),
                   ],
                 ),
               ),

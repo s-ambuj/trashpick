@@ -35,38 +35,23 @@ class _BottomNavBarState extends State<BottomNavBar> {
   List<BottomNavigationBarItem> appBottomNavBarItems =
       const <BottomNavigationBarItem>[
     BottomNavigationBarItem(
-      icon: Icon(
-        Icons.home_rounded,
-        size: 30.0,
-      ),
+      icon: Icon(Icons.home_rounded, size: 30.0),
       label: 'Home',
     ),
     BottomNavigationBarItem(
-      icon: Icon(
-        Icons.transfer_within_a_station_rounded,
-        size: 30.0,
-      ),
+      icon: Icon(Icons.recycling_sharp, size: 30.0),
       label: 'Trash to be collected',
     ),
     BottomNavigationBarItem(
-      icon: Icon(
-        Icons.restore_from_trash,
-        size: 30.0,
-      ),
+      icon: Icon(Icons.notifications_rounded, size: 30.0),
+      label: 'Articles',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.restore_from_trash, size: 30.0),
       label: 'Recycling Centers',
     ),
     BottomNavigationBarItem(
-      icon: Icon(
-        Icons.notifications_rounded,
-        size: 30.0,
-      ),
-      label: 'Be Aware',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(
-        Icons.settings_rounded,
-        size: 30.0,
-      ),
+      icon: Icon(Icons.settings_rounded, size: 30.0),
       label: 'My Profile',
     ),
   ];
@@ -75,12 +60,21 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       currentIndex: _selectedPage,
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
-      selectedItemColor: AppThemeData().primaryColor,
+      selectedItemColor:
+          Colors.lightBlueAccent, // Light aqua color for selected
       unselectedItemColor: AppThemeData().greyColor,
+      backgroundColor: Colors.white, // White background for the nav bar
       onTap: _onItemTapped,
       items: appBottomNavBarItems,
+      showSelectedLabels: true, // Show labels for better accessibility
+      showUnselectedLabels: true,
+      selectedLabelStyle: TextStyle(
+        fontWeight: FontWeight.bold,
+        color: Colors.lightBlueAccent, // Light aqua color for selected labels
+      ),
+      unselectedLabelStyle: TextStyle(
+        color: AppThemeData().greyColor,
+      ),
     );
   }
 
@@ -95,8 +89,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
       print("Current User Account Type: Trash Collector");
       pageList.add(TrashToBeCollected());
     }
-    pageList.add(RecyclingCenters());
     pageList.add(BeAware());
+    pageList.add(RecyclingCenters());
     pageList.add(SettingsPage());
   }
 
@@ -104,30 +98,34 @@ class _BottomNavBarState extends State<BottomNavBar> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async => showDialog<bool>(
-          context: context,
-          builder: (c) => AlertDialog(
-                title: Text('Exit from TrashPick'),
-                content: Text('Do you really want to exit'),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0))),
-                actions: [
-                  TextButton(
-                    child: Text('Yes'),
-                    onPressed: () => Navigator.pop(c, true),
-                  ),
-                  TextButton(
-                    child: Text('No'),
-                    onPressed: () => Navigator.pop(c, false),
-                  ),
-                ],
-              )),
-      child: Scaffold(
-          backgroundColor: AppThemeData().whiteColor,
-          body: IndexedStack(
-            index: _selectedPage,
-            children: pageList,
+        context: context,
+        builder: (c) => AlertDialog(
+          title: Text('Exit from TrashPick'),
+          content: Text('Do you really want to exit?'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+                Radius.circular(12.0)), // Updated border radius
           ),
-          bottomNavigationBar: appBottomNavBar()),
+          actions: [
+            TextButton(
+              child: Text('Yes', style: TextStyle(color: Colors.red)),
+              onPressed: () => Navigator.pop(c, true),
+            ),
+            TextButton(
+              child: Text('No', style: TextStyle(color: Colors.green)),
+              onPressed: () => Navigator.pop(c, false),
+            ),
+          ],
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: AppThemeData().whiteColor,
+        body: IndexedStack(
+          index: _selectedPage,
+          children: pageList,
+        ),
+        bottomNavigationBar: appBottomNavBar(),
+      ),
     );
   }
 

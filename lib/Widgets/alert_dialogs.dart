@@ -9,13 +9,24 @@ class SignOutAlertDialog {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm for Sign Out'),
-          content: Text("Are You Sure Want To Sign Out ?"),
+          title: Text(
+            'Confirm Sign Out',
+            style: TextStyle(
+                color: Colors.lightBlueAccent.shade700), // Light aqua title
+          ),
+          content: Text(
+            "Are you sure you want to sign out?",
+            style:
+                TextStyle(color: Colors.grey.shade800), // Subtle content color
+          ),
           actions: <Widget>[
             TextButton(
               child: Text(
                 "NO",
-                style: Theme.of(context).textTheme.button,
+                style: TextStyle(
+                  color: Colors.cyan.shade700, // Aqua color for "NO" button
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -25,7 +36,10 @@ class SignOutAlertDialog {
             TextButton(
               child: Text(
                 "YES",
-                style: Theme.of(context).textTheme.button,
+                style: TextStyle(
+                  color: Colors.cyan.shade700, // Aqua color for "YES" button
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               onPressed: () async {
                 await FirebaseAuth.instance.signOut();
@@ -42,7 +56,11 @@ class SignOutAlertDialog {
             ),
           ],
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            borderRadius: BorderRadius.all(
+                Radius.circular(15.0)), // Softer rounded corners
+          ),
+          backgroundColor:
+              Colors.lightBlueAccent.shade100, // Light aqua background
         );
       },
     );

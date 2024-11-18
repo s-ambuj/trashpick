@@ -18,20 +18,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final userReference = FirebaseFirestore.instance.collection('Users');
   final FirebaseAuth auth = FirebaseAuth.instance;
-  String badgeType;
 
   @override
   void initState() {
-    _setBadgeType();
     super.initState();
-  }
-
-  _setBadgeType() {
-    if (widget.accountType == "Trash Picker") {
-      badgeType = "Picker";
-    } else if (widget.accountType == "Trash Collector") {
-      badgeType = "Collector";
-    }
   }
 
   _statTitle(String title) {
@@ -40,54 +30,22 @@ class _HomePageState extends State<HomePage> {
       textAlign: TextAlign.center,
       style: TextStyle(
           fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
-          fontWeight: FontWeight.bold),
+          fontWeight: FontWeight.bold,
+          color: Colors.white),
     );
   }
 
   _statDetail(double numberValue, bool isDouble) {
-    String detailString;
-    if (isDouble) {
-      detailString = numberValue.toString();
-    } else {
-      detailString = numberValue.toInt().toString();
-    }
+    String detailString =
+        isDouble ? numberValue.toString() : numberValue.toInt().toString();
 
     return Text(
       detailString,
       textAlign: TextAlign.center,
       style: TextStyle(
           fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
-          fontWeight: FontWeight.bold),
-    );
-  }
-
-  _badgeRequiresPoints(String points) {
-    return Text(
-      points,
-      textAlign: TextAlign.center,
-      style: TextStyle(
-          fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
-          fontWeight: FontWeight.normal),
-    );
-  }
-
-  _badgeDesignsWidget(String image, String badgeName, String badgePoints) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Image.asset(
-          image,
-          height: 60.0,
-          width: 60.0,
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _statTitle(badgeName),
-            _badgeRequiresPoints(badgePoints),
-          ],
-        )
-      ],
+          fontWeight: FontWeight.bold,
+          color: Colors.white),
     );
   }
 
@@ -99,12 +57,12 @@ class _HomePageState extends State<HomePage> {
           .snapshots(),
       builder: (context, dataSnapshot) {
         if (!dataSnapshot.hasData) {
-          //return profileHeaderShimmer();
           return Text(
             "Hi! ",
             style: TextStyle(
                 fontSize: Theme.of(context).textTheme.headline6.fontSize,
-                fontWeight: FontWeight.bold),
+                fontWeight: FontWeight.bold,
+                color: Colors.white),
           );
         } else {
           UserModelClass userModelClass =
@@ -116,7 +74,8 @@ class _HomePageState extends State<HomePage> {
                 "Hi! ${userModelClass.name}",
                 style: TextStyle(
                     fontSize: Theme.of(context).textTheme.headline6.fontSize,
-                    fontWeight: FontWeight.normal),
+                    fontWeight: FontWeight.normal,
+                    color: Colors.white),
               ),
             ],
           );
@@ -136,67 +95,91 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _statTitle("Total Trash Pick Ups"),
-                SizedBox(
-                  height: 10.0,
-                ),
+                SizedBox(height: 10.0),
                 _statTitle("Total Points"),
               ],
             ),
-            SizedBox(
-              width: 20.0,
-            ),
+            SizedBox(width: 20.0),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _statDetail(4, false),
-                SizedBox(
-                  height: 10.0,
-                ),
+                SizedBox(height: 10.0),
                 _statDetail(52, false),
               ],
             )
           ],
         ),
-        Column(
-          children: [
-            Image.asset(
-              'assets/images/badge_starter.png',
-              height: 70.0,
-              width: 70.0,
-            ),
-            SizedBox(
-              height: 5.0,
-            ),
-            _statTitle("Starter\n$badgeType"),
-          ],
-        )
       ],
     );
   }
 
-  _badgeDetails() {
+  _subscriptionOptions() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        widget.accountType == "Trash Picker"
-            ? _statTitle("Schedule more trash pick ups to unlock the,")
-            : _statTitle("Collect more trash to unlock the,"),
-        SizedBox(
-          height: 10.0,
-        ),
-        _badgeDesignsWidget('assets/images/badge_bronze.png',
-            "Bronze $badgeType", "100 Points"),
-        SizedBox(
-          height: 10.0,
-        ),
-        _badgeDesignsWidget('assets/images/badge_silver.png',
-            "Silver $badgeType", "1000 Points"),
-        SizedBox(
-          height: 10.0,
-        ),
-        _badgeDesignsWidget(
-            'assets/images/badge_gold.png', "Gold $badgeType", "10000 Points"),
+        _statTitle("Subscription Options"),
+        SizedBox(height: 20.0),
+        _subscriptionCard("Basic Plan", "Requires: 10000 Points",
+            "Basic features of trash picking", () {
+          // Handle subscription logic
+        }),
+        SizedBox(height: 20.0),
+        _subscriptionCard("Pro Plan", "Requires: 15000 Points",
+            "Advanced features and priority support", () {
+          // Handle subscription logic
+        }),
+        SizedBox(height: 20.0),
+        _subscriptionCard("Premium Plan", "Requires: 20000 Points",
+            "All features with exclusive rewards", () {
+          // Handle subscription logic
+        }),
       ],
+    );
+  }
+
+  _subscriptionCard(String title, String pointsRequirement, String features,
+      Function onSubscribe) {
+    return Card(
+      color: Colors.lightBlue[300], // Aqua color for the card
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      elevation: 4.0,
+      child: Container(
+        width: double.infinity, // Set to fill available width
+        height: 150, // Fixed height for uniformity
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            ),
+            SizedBox(height: 10.0),
+            Text(
+              pointsRequirement,
+              style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.white),
+            ),
+            SizedBox(height: 10.0),
+            Text(
+              features,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.white),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -220,19 +203,28 @@ class _HomePageState extends State<HomePage> {
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.lightBlue[100],
+                Colors.lightBlue[300]
+              ], // Light aqua gradient
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 8.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Image.asset(
                   'assets/logos/trashpick_logo_curved.png',
                   height: 75.0,
                   width: 75.0,
                 ),
-                SizedBox(
-                  height: 10.0,
-                ),
+                SizedBox(height: 10.0),
                 welcomeHeader(),
                 Center(
                   child: Text(
@@ -240,23 +232,14 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(
                         fontSize:
                             Theme.of(context).textTheme.headline5.fontSize,
-                        fontWeight: FontWeight.bold),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
-/*                Text(
-                  "${widget.accountType}",
-                  style: TextStyle(
-                      fontSize: Theme.of(context).textTheme.headline4.fontSize,
-                      fontWeight: FontWeight.bold),
-                ),*/
+                SizedBox(height: 20.0),
                 _profileStats(),
-                SizedBox(
-                  height: 30.0,
-                ),
-                _badgeDetails(),
+                SizedBox(height: 30.0),
+                _subscriptionOptions(), // Adding the subscription options here
               ],
             ),
           ),

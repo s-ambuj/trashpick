@@ -20,9 +20,9 @@ class ThemeProvider extends ChangeNotifier {
 }
 
 class AppThemeData {
-  final Color primaryColor = Color.fromRGBO(34, 111, 39, 1);
+  final Color primaryColor = Color(0xFF00796B);
   final Color secondaryColor = Colors.grey.shade900;
-  final Color accentColor = Color.fromRGBO(50, 163, 57, 1);
+  final Color accentColor = Color(0xFFB2EBF2);
   final Color redColor = Colors.red;
   final Color blueColor = Colors.blue;
   final Color deepBlueColor = Colors.blue.shade800;
@@ -31,12 +31,16 @@ class AppThemeData {
   final Color greyColor = Colors.grey;
   final Color grey200Color = Colors.grey.shade200;
 
+  // Light Aqua Colors
+  final Color lightAqua = Color(0xFFB2EBF2); // Light aqua background
+  final Color darkAqua = Color(0xFF00796B); // Darker aqua for text
+
   static final lightTheme = ThemeData(
     brightness: Brightness.light,
     scaffoldBackgroundColor: Colors.white,
     colorScheme: ColorScheme.light(),
     primaryColor: Color.fromRGBO(34, 111, 39, 1),
-    backgroundColor: Colors.grey.shade900,
+    backgroundColor: Colors.white,
     accentColor: Color.fromRGBO(50, 163, 57, 1),
     fontFamily: 'Open Sans',
     buttonTheme: ButtonThemeData(
@@ -45,18 +49,30 @@ class AppThemeData {
     appBarTheme: AppBarTheme(color: Colors.white, elevation: 0.0),
     iconTheme: IconThemeData(color: Colors.grey.shade900),
     textTheme: TextTheme(
-      headline1: TextStyle(fontSize: 96.0, fontWeight: FontWeight.bold),
-      headline2: TextStyle(fontSize: 60.0, fontWeight: FontWeight.bold),
-      headline3: TextStyle(fontSize: 48.0, fontWeight: FontWeight.bold),
-      headline4: TextStyle(fontSize: 34.0, fontWeight: FontWeight.bold),
-      headline5: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-      headline6: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-      subtitle1: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-      subtitle2: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
-      bodyText1: TextStyle(fontSize: 14.0, fontWeight: FontWeight.normal),
-      bodyText2: TextStyle(fontSize: 16.0, fontWeight: FontWeight.normal),
-      caption: TextStyle(fontSize: 12.0, fontWeight: FontWeight.normal),
-      overline: TextStyle(fontSize: 10.0, fontWeight: FontWeight.normal),
+      headline1: TextStyle(
+          fontSize: 96.0, fontWeight: FontWeight.bold, color: Colors.black),
+      headline2: TextStyle(
+          fontSize: 60.0, fontWeight: FontWeight.bold, color: Colors.black),
+      headline3: TextStyle(
+          fontSize: 48.0, fontWeight: FontWeight.bold, color: Colors.black),
+      headline4: TextStyle(
+          fontSize: 34.0, fontWeight: FontWeight.bold, color: Colors.black),
+      headline5: TextStyle(
+          fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black),
+      headline6: TextStyle(
+          fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.black),
+      subtitle1: TextStyle(
+          fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black),
+      subtitle2: TextStyle(
+          fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.black),
+      bodyText1: TextStyle(
+          fontSize: 14.0, fontWeight: FontWeight.normal, color: Colors.black),
+      bodyText2: TextStyle(
+          fontSize: 16.0, fontWeight: FontWeight.normal, color: Colors.black),
+      caption: TextStyle(
+          fontSize: 12.0, fontWeight: FontWeight.normal, color: Colors.black),
+      overline: TextStyle(
+          fontSize: 10.0, fontWeight: FontWeight.normal, color: Colors.black),
     ),
   );
 
@@ -74,18 +90,30 @@ class AppThemeData {
     appBarTheme: AppBarTheme(color: Colors.grey.shade900, elevation: 0.0),
     iconTheme: IconThemeData(color: Colors.white),
     textTheme: TextTheme(
-      headline1: TextStyle(fontSize: 96.0, fontWeight: FontWeight.bold),
-      headline2: TextStyle(fontSize: 60.0, fontWeight: FontWeight.bold),
-      headline3: TextStyle(fontSize: 48.0, fontWeight: FontWeight.bold),
-      headline4: TextStyle(fontSize: 34.0, fontWeight: FontWeight.bold),
-      headline5: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-      headline6: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-      subtitle1: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-      subtitle2: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
-      bodyText1: TextStyle(fontSize: 14.0, fontWeight: FontWeight.normal),
-      bodyText2: TextStyle(fontSize: 16.0, fontWeight: FontWeight.normal),
-      caption: TextStyle(fontSize: 12.0, fontWeight: FontWeight.normal),
-      overline: TextStyle(fontSize: 10.0, fontWeight: FontWeight.normal),
+      headline1: TextStyle(
+          fontSize: 96.0, fontWeight: FontWeight.bold, color: Colors.white),
+      headline2: TextStyle(
+          fontSize: 60.0, fontWeight: FontWeight.bold, color: Colors.white),
+      headline3: TextStyle(
+          fontSize: 48.0, fontWeight: FontWeight.bold, color: Colors.white),
+      headline4: TextStyle(
+          fontSize: 34.0, fontWeight: FontWeight.bold, color: Colors.white),
+      headline5: TextStyle(
+          fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.white),
+      headline6: TextStyle(
+          fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.white),
+      subtitle1: TextStyle(
+          fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
+      subtitle2: TextStyle(
+          fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.white),
+      bodyText1: TextStyle(
+          fontSize: 14.0, fontWeight: FontWeight.normal, color: Colors.white),
+      bodyText2: TextStyle(
+          fontSize: 16.0, fontWeight: FontWeight.normal, color: Colors.white),
+      caption: TextStyle(
+          fontSize: 12.0, fontWeight: FontWeight.normal, color: Colors.white),
+      overline: TextStyle(
+          fontSize: 10.0, fontWeight: FontWeight.normal, color: Colors.white),
     ),
   );
 }

@@ -16,7 +16,6 @@ class _TrashToBeCollectedListState extends State<TrashToBeCollectedList> {
   final firestoreInstance = FirebaseFirestore.instance;
   TrashPickUpsModel trashPickUpsModel;
   UserModelClass selectedTrashPickerModel;
-  String accountType = "Trash Collector";
   bool viewTrashPicker = false;
 
   @override
@@ -25,13 +24,10 @@ class _TrashToBeCollectedListState extends State<TrashToBeCollectedList> {
   }
 
   loadingProgress() {
-    return Container(
-      child: Center(
-        child: SizedBox(
-          child: CircularProgressIndicator(),
-          height: 40.0,
-          width: 40.0,
-        ),
+    return Center(
+      child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Colors
+            .lightBlueAccent), // Light aqua color for the progress indicator
       ),
     );
   }
@@ -39,74 +35,62 @@ class _TrashToBeCollectedListState extends State<TrashToBeCollectedList> {
   Widget trashPickersDetailsCard(
       AsyncSnapshot<QuerySnapshot> snapshot, UserModelClass userModelClass) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: Container(
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          color: Colors.grey.shade100,
-          child: InkWell(
-            splashColor: Colors.blue.withAlpha(30),
-            onTap: () {
-              print('Selected Trash: ${userModelClass.uuid}');
-              setState(() {
-                viewTrashPicker = true;
-                selectedTrashPickerModel = userModelClass;
-              });
-            },
-            child: snapshot.data.docs.length == null
-                ? Container()
-                : Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ClipOval(
-                          child: Image.network(
-                            userModelClass.profileImage,
-                            fit: BoxFit.cover,
-                            height: 80,
-                            width: 80,
-                          ),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        color: Colors.white, // White background for cards
+        elevation: 3, // Adding slight elevation for depth
+        child: InkWell(
+          splashColor: Colors.lightBlueAccent.withAlpha(30),
+          onTap: () {
+            setState(() {
+              viewTrashPicker = true;
+              selectedTrashPickerModel = userModelClass;
+            });
+          },
+          child: snapshot.data.docs.isEmpty
+              ? Container()
+              : Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ClipOval(
+                        child: Image.network(
+                          userModelClass.profileImage,
+                          fit: BoxFit.cover,
+                          height: 80,
+                          width: 80,
                         ),
                       ),
-                      SizedBox(
-                        width: 10.0,
-                      ),
-                      Expanded(
-                        child: Container(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                userModelClass.name,
-                                style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .textTheme
-                                        .headline6
-                                        .fontSize,
-                                    fontWeight: FontWeight.w500,
-                                    color: Theme.of(context).primaryColor),
-                              ),
-                              SizedBox(
-                                height: 5.0,
-                              ),
-                              Text(
-                                userModelClass.homeAddress,
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    color: AppThemeData
-                                        .lightTheme.iconTheme.color),
-                              ),
-                            ],
+                    ),
+                    SizedBox(width: 10.0),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            userModelClass.name,
+                            style: TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.w500,
+                              color: Colors
+                                  .lightBlueAccent, // Light aqua color for text
+                            ),
                           ),
-                        ),
+                          SizedBox(height: 5.0),
+                          Text(
+                            userModelClass.homeAddress,
+                            style: TextStyle(
+                              color: AppThemeData.lightTheme.iconTheme.color,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-          ),
+                    ),
+                  ],
+                ),
         ),
       ),
     );
@@ -119,7 +103,6 @@ class _TrashToBeCollectedListState extends State<TrashToBeCollectedList> {
         stream: FirebaseFirestore.instance
             .collection("Users")
             .where('accountType', isEqualTo: "Trash Picker")
-            //.orderBy('name',descending: false)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -127,23 +110,18 @@ class _TrashToBeCollectedListState extends State<TrashToBeCollectedList> {
           }
           return !snapshot.hasData
               ? Container()
-              : snapshot.data.docs.length.toString() == "0"
+              : snapshot.data.docs.isEmpty
                   ? Container(
                       height: 250.0,
-                      width: 200.0,
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(
-                            height: 30.0,
-                          ),
                           Text(
                             "No Trash Pickers registered yet",
-                            style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .headline6
-                                    .fontSize),
+                            style:
+                                TextStyle(fontSize: 20.0, color: Colors.black),
                           ),
+                          SizedBox(height: 10.0),
                           ClipOval(
                             child: Image.asset(
                               'assets/images/trashpick_user_avatar.png',
@@ -171,35 +149,10 @@ class _TrashToBeCollectedListState extends State<TrashToBeCollectedList> {
     );
   }
 
-  getAllTrashPickUps() {
-    FirebaseFirestore.instance.collection("Users").get().then((querySnapshot) {
-      querySnapshot.docs.forEach((result) {
-        FirebaseFirestore.instance
-            .collection("Users")
-            .doc(result.id)
-            .collection("Trash Pick Ups")
-            .get()
-            .then((querySnapshot) {
-          querySnapshot.docs.forEach((result) {
-            TrashPickUpsModel trashPickUpsModel =
-                TrashPickUpsModel.fromDocument(result);
-
-            print("--------------------- Trash Pick Ups ---------------------\n"
-                "id: ${trashPickUpsModel.trashID}\n"
-                "name: ${trashPickUpsModel.trashName}\n"
-                "image: ${trashPickUpsModel.trashImage}");
-          });
-        });
-      });
-    });
-  }
-
   _selectedTrashPicker() {
     return Column(
       children: [
-        SizedBox(
-          height: 10.0,
-        ),
+        SizedBox(height: 10.0),
         Row(
           children: [
             IconButton(
@@ -227,13 +180,13 @@ class _TrashToBeCollectedListState extends State<TrashToBeCollectedList> {
     return Container(
       child: Card(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
         ),
-        color: Colors.grey.shade100,
+        color: Colors.white, // White background for cards
+        elevation: 3, // Adding slight elevation for depth
         child: InkWell(
-          splashColor: Colors.blue.withAlpha(30),
+          splashColor: Colors.lightBlueAccent.withAlpha(30),
           onTap: () {
-            print('Selected Trash: ${trashPickUpsModel.trashID}');
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -241,7 +194,7 @@ class _TrashToBeCollectedListState extends State<TrashToBeCollectedList> {
                       userID, trashPickUpsModel.trashID, "Trash Collector")),
             );
           },
-          child: snapshot.data.docs.length == null
+          child: snapshot.data.docs.isEmpty
               ? Container()
               : Row(
                   children: [
@@ -254,39 +207,27 @@ class _TrashToBeCollectedListState extends State<TrashToBeCollectedList> {
                         width: 150,
                       ),
                     ),
-                    SizedBox(
-                      width: 10.0,
-                    ),
+                    SizedBox(width: 10.0),
                     Expanded(
-                      child: Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              trashPickUpsModel.trashName,
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .headline6
-                                      .fontSize,
-                                  fontWeight: FontWeight.w500,
-                                  color: Theme.of(context).primaryColor),
-                            ),
-                            Divider(
-                              color: Theme.of(context).iconTheme.color,
-                            ),
-                            Text(
-                              trashPickUpsModel.trashDescription,
-                              textAlign: TextAlign.start,
-                              style: TextStyle(
-                                  color:
-                                      AppThemeData.lightTheme.iconTheme.color),
-                            ),
-                            //Text(trashPickUpsModel.trashLocationAddress),
-                          ],
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            trashPickUpsModel.trashName,
+                            style: TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w500,
+                                color:
+                                    Colors.lightBlueAccent), // Light aqua color
+                          ),
+                          Divider(
+                              color: AppThemeData.lightTheme.iconTheme.color),
+                          Text(
+                            trashPickUpsModel.trashDescription,
+                            style: TextStyle(
+                                color: AppThemeData.lightTheme.iconTheme.color),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -299,7 +240,6 @@ class _TrashToBeCollectedListState extends State<TrashToBeCollectedList> {
   _scheduledTrashPicksList(String userName, String userID) {
     return Container(
       height: MediaQuery.of(context).size.height,
-      //color: Colors.red,
       child: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection("Users")
@@ -310,23 +250,18 @@ class _TrashToBeCollectedListState extends State<TrashToBeCollectedList> {
         builder: (context, snapshot) {
           return !snapshot.hasData
               ? Container()
-              : snapshot.data.docs.length.toString() == "0"
+              : snapshot.data.docs.isEmpty
                   ? Container(
                       height: 250.0,
-                      width: 200.0,
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(
-                            height: 30.0,
-                          ),
                           Text(
                             "$userName has no scheduled trash pick ups yet",
-                            style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .headline6
-                                    .fontSize),
+                            style:
+                                TextStyle(fontSize: 20.0, color: Colors.black),
                           ),
+                          SizedBox(height: 10.0),
                           Image.asset(
                             'assets/icons/icon_broom.png',
                             height: 100.0,
@@ -355,6 +290,11 @@ class _TrashToBeCollectedListState extends State<TrashToBeCollectedList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Trash To Be Collected"),
+        backgroundColor:
+            Colors.lightBlueAccent, // Light aqua color for the AppBar
+      ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Center(
@@ -364,12 +304,15 @@ class _TrashToBeCollectedListState extends State<TrashToBeCollectedList> {
                 )
               : Column(
                   children: [
-                    SizedBox(
-                      height: 10.0,
-                    ),
+                    SizedBox(height: 10.0),
                     Text(
                       "Trash Pickers",
-                      style: Theme.of(context).textTheme.bodyText2,
+                      style: TextStyle(
+                        fontSize: 22.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors
+                            .lightBlueAccent, // Light aqua color for title
+                      ),
                     ),
                     _trashPickersList(),
                   ],

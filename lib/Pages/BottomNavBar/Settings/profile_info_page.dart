@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:trashpick/Models/user_model.dart';
@@ -19,231 +18,103 @@ class ProfileInfoPage extends StatefulWidget {
 
 class _ProfileInfoPageState extends State<ProfileInfoPage> {
   var currentUserID = FirebaseAuth.instance.currentUser.uid;
-  CollectionReference imgRef;
-  firebase_storage.Reference ref;
-  File _userSelectedFileImage;
   String firebaseStorageUploadedImageURL;
   String _userLatestProfileImage;
-
-  // Uploading Process
-  bool isStartToUpload = false;
-  bool isUploadComplete = false;
-  bool isAnError = false;
-  double circularProgressVal;
+  File _userSelectedFileImage;
 
   // -------------------------------- UPLOADING PROCESS -------------------------------- \\
 
-  void ifAnError() {
-    Navigator.pop(context);
-    setState(() {
-      isStartToUpload = false;
-      isUploadComplete = false;
-      isAnError = true;
-      //Navigator.pop(context);
-      showAlertDialog(context);
-    });
-  }
-
   void sendErrorCode(String error) {
     ToastMessages().toastError(error, context);
-    ifAnError();
   }
 
   void sendSuccessCode() {
     print("Profile Update Success!");
-    Navigator.pop(context);
-    setState(() {
-      isStartToUpload = false;
-      isUploadComplete = true;
-    });
-    showAlertDialog(context);
-  }
-
-  showAlertDialog(BuildContext context) {
-    // show the dialog
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: !isUploadComplete
-                  ? Center(child: Text("Updating Profile"))
-                  : Center(child: Text("Profile Updated")),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (!isUploadComplete)
-                    !isAnError
-                        ? Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 30.0,
-                              ),
-                              CircularProgressIndicator(
-                                value: circularProgressVal,
-                                strokeWidth: 6,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.teal.shade700),
-                              ),
-                              SizedBox(
-                                height: 30.0,
-                              ),
-                              Text("Please wait until your profile is update.",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                          fontFamily: 'Montserrat',
-                                          fontSize: 16.0)
-                                      .copyWith(color: Colors.grey.shade900)),
-                            ],
-                          )
-                        : Container(
-                            child: Column(
-                            children: [
-                              Text("Error!",
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                  )),
-                              SizedBox(
-                                height: 50.0,
-                              ),
-                              new ButtonWidget(
-                                  text: "Try Again",
-                                  textColor: AppThemeData().whiteColor,
-                                  color: AppThemeData().primaryColor,
-                                  onClicked: () {
-                                    Navigator.pop(context);
-                                  }),
-                            ],
-                          ))
-                  else
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 5.0),
-                        child: Column(
-                          children: [
-                            Image.asset(
-                              'assets/icons/icon_profile_upload.png',
-                              height: 50,
-                              width: 50,
-                            ),
-                            SizedBox(height: 30),
-                            Text("Profile has uploaded!",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                        fontFamily: 'Montserrat',
-                                        fontSize: 22.0)
-                                    .copyWith(
-                                        color: Colors.grey.shade900,
-                                        fontWeight: FontWeight.bold)),
-                            SizedBox(height: 50),
-                            new ButtonWidget(
-                              textColor: AppThemeData().whiteColor,
-                              color: AppThemeData().secondaryColor,
-                              text: "OK",
-                              onClicked: () {
-                                Navigator.pop(context);
-                              },
-                            )
-                          ],
-                        ),
-                      ),
-                    )
-                ],
-              ),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
-            );
-          },
-        );
-      },
-    );
+    ToastMessages().toastSuccess("Profile updated successfully!", context);
   }
 
   void validateEdits() {
     if (_userSelectedFileImage == null) {
       ToastMessages().toastError("Please select an image", context);
     } else {
-      showAlertDialog(context);
       uploadImagesToStorage();
     }
   }
 
   // -------------------------------- CHANGE IMAGE -------------------------------- \\
 
-  _imgFromCamera() async {
-    File fileImage = await ImagePicker.pickImage(
-        source: ImageSource.camera, imageQuality: 50);
+  Future<void> _imgFromCamera() async {
+    final pickedFile = await ImagePicker().getImage(
+      source: ImageSource.camera,
+      imageQuality: 50,
+    );
 
-    setState(() {
-      _userSelectedFileImage = fileImage;
-    });
+    if (pickedFile != null) {
+      setState(() {
+        _userSelectedFileImage = File(pickedFile.path);
+      });
+    }
   }
 
-  _imgFromGallery() async {
-    File fileImage = await ImagePicker.pickImage(
-        source: ImageSource.gallery, imageQuality: 50);
+  Future<void> _imgFromGallery() async {
+    final pickedFile = await ImagePicker().getImage(
+      source: ImageSource.gallery,
+      imageQuality: 50,
+    );
 
-    setState(() {
-      _userSelectedFileImage = fileImage;
-    });
+    if (pickedFile != null) {
+      setState(() {
+        _userSelectedFileImage = File(pickedFile.path);
+      });
+    }
   }
 
-  changeProfilePicture(context) {
+  void changeProfilePicture(context) {
     showModalBottomSheet(
-        context: context,
-        builder: (BuildContext bc) {
-          return SafeArea(
-            child: Container(
-              child: new Wrap(
-                children: <Widget>[
-                  new ListTile(
-                      leading: new Icon(Icons.photo_library),
-                      title: new Text('Photo Library'),
-                      onTap: () {
-                        _imgFromGallery();
-                        Navigator.of(context).pop();
-                      }),
-                  new ListTile(
-                    leading: new Icon(Icons.photo_camera),
-                    title: new Text('Camera'),
-                    onTap: () {
-                      _imgFromCamera();
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
+      context: context,
+      backgroundColor: Colors.lightBlueAccent.withOpacity(0.9),
+      builder: (BuildContext bc) {
+        return SafeArea(
+          child: Container(
+            child: Wrap(
+              children: <Widget>[
+                ListTile(
+                  leading: Icon(Icons.photo_library),
+                  title: Text('Photo Library'),
+                  onTap: () {
+                    _imgFromGallery();
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.photo_camera),
+                  title: Text('Camera'),
+                  onTap: () {
+                    _imgFromCamera();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   Future<void> uploadImagesToStorage() async {
     if (_userSelectedFileImage != null) {
-      FirebaseStorage.instance.refFromURL(_userLatestProfileImage).delete();
-
       try {
-        ref = firebase_storage.FirebaseStorage.instance.ref().child(
-            'User Profile Images/${FirebaseAuth.instance.currentUser.uid}/${FirebaseAuth.instance.currentUser.uid}');
+        Reference ref = FirebaseStorage.instance
+            .ref()
+            .child('User Profile Images/${currentUserID}/$currentUserID');
         await ref.putFile(_userSelectedFileImage);
 
-        String downloadURL = await firebase_storage.FirebaseStorage.instance
-            .ref()
-            .child(
-                'User Profile Images/${FirebaseAuth.instance.currentUser.uid}/${FirebaseAuth.instance.currentUser.uid}')
-            .getDownloadURL();
-        firebaseStorageUploadedImageURL = downloadURL.toString();
-        print("Image Uploaded to Firebase Storage!");
-        print("Image URL: " + firebaseStorageUploadedImageURL);
+        String downloadURL = await ref.getDownloadURL();
+        firebaseStorageUploadedImageURL = downloadURL;
         saveEditProfileToFireStore(firebaseStorageUploadedImageURL);
       } catch (e) {
-        print(e.toString());
-        ifAnError();
+        sendErrorCode(e.toString());
       }
     } else {
       saveEditProfileToFireStore(_userLatestProfileImage);
@@ -251,47 +122,17 @@ class _ProfileInfoPageState extends State<ProfileInfoPage> {
   }
 
   saveEditProfileToFireStore(String firebaseStorageUploadedImageURL) {
-    print("IMAGE: " + firebaseStorageUploadedImageURL);
-
     FirebaseFirestore.instance
         .collection('Users')
-        .doc(currentUserID.toString())
+        .doc(currentUserID)
         .update({
           'profileImage': firebaseStorageUploadedImageURL,
         })
-        .then(
-          (value) => sendSuccessCode(),
-        )
+        .then((value) => sendSuccessCode())
         .catchError((error) => sendErrorCode(error.toString()));
   }
 
   // -------------------------------- PROFILE DETAILS -------------------------------- \\
-
-  _columnTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20.0),
-      child: Text(
-        title,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
-            fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  _columnDetail(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10.0),
-      child: Text(
-        title,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
-            fontWeight: FontWeight.normal),
-      ),
-    );
-  }
 
   Widget _profileDetails() {
     return Padding(
@@ -299,67 +140,45 @@ class _ProfileInfoPageState extends State<ProfileInfoPage> {
       child: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection("Users")
-            .where('uuid', isEqualTo: "${currentUserID.toString()}")
+            .where('uuid', isEqualTo: currentUserID)
             .snapshots(),
         builder: (context, dataSnapshot) {
           if (!dataSnapshot.hasData) {
-            return Text(
-              "Hi! ",
-              style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.headline6.fontSize,
-                  fontWeight: FontWeight.bold),
-            );
+            return Center(child: CircularProgressIndicator());
           } else {
             UserModelClass userModelClass =
                 UserModelClass.fromDocument(dataSnapshot.data.docs[0]);
-
             _userLatestProfileImage = userModelClass.profileImage;
 
             return ListView(
               physics: BouncingScrollPhysics(),
               children: [
-                SizedBox(
-                  height: 5.0,
-                ),
+                SizedBox(height: 10.0),
                 Center(
                   child: _userSelectedFileImage != null
-                      ? new ImageFramesWidgets().userProfileFrame(
-                          _userSelectedFileImage, 150.0, 65.0, false)
-                      : new ImageFramesWidgets().userProfileFrame(
-                          _userLatestProfileImage, 150.0, 65.0, true),
+                      ? ImageFramesWidgets().userProfileFrame(
+                          _userSelectedFileImage, 150.0, 150.0, false)
+                      : ImageFramesWidgets().userProfileFrame(
+                          _userLatestProfileImage, 150.0, 150.0, true),
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
+                SizedBox(height: 20.0),
                 Center(
                   child: TextWithIconButtonWidget(
                     text: "Click to Change Image",
                     icon: Icons.camera_alt_rounded,
                     iconToLeft: true,
                     onClicked: () {
-                      print('Change Profile Image');
                       changeProfilePicture(context);
                     },
                   ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _columnTitle("Name"),
-                    _columnDetail(userModelClass.name),
-                    _columnTitle("Account Type"),
-                    _columnDetail(userModelClass.accountType),
-                    _columnTitle("Contact Number"),
-                    _columnDetail(userModelClass.contactNumber),
-                    _columnTitle("Email"),
-                    _columnDetail(userModelClass.email),
-                    _columnTitle("Home Address"),
-                    _columnDetail(userModelClass.homeAddress),
-                  ],
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
+                Divider(color: Colors.grey[400]),
+                SizedBox(height: 10.0),
+                _buildProfileDetail("Name", userModelClass.name),
+                _buildProfileDetail("Account Type", userModelClass.accountType),
+                _buildProfileDetail("Contact Number", userModelClass.contactNumber),
+                _buildProfileDetail("Email", userModelClass.email),
+                SizedBox(height: 20.0),
                 MinButtonWidget(
                   text: "Update Profile",
                   color: AppThemeData().secondaryColor,
@@ -367,14 +186,41 @@ class _ProfileInfoPageState extends State<ProfileInfoPage> {
                     validateEdits();
                   },
                 ),
-                SizedBox(
-                  height: 20.0,
-                ),
+                SizedBox(height: 20.0),
               ],
             );
           }
         },
       ),
+    );
+  }
+
+  Widget _buildProfileDetail(String title, String detail) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.lightBlue[800],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: Text(
+            detail,
+            style: TextStyle(
+              fontSize: 16.0,
+              color: Colors.grey[700],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -397,7 +243,10 @@ class _ProfileInfoPageState extends State<ProfileInfoPage> {
           )
         ],
       ),
-      body: _profileDetails(),
+      body: Container(
+        color: Colors.lightBlue[50], // Light aqua background
+        child: _profileDetails(),
+      ),
     );
   }
 }

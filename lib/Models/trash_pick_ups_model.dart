@@ -37,8 +37,6 @@ class TrashPickUpsModel {
       trashDescription: documentSnapshot['trashDescription'],
       trashImage: documentSnapshot['trashImage'],
       trashTypes: documentSnapshot['trashTypes'],
-      trashLocationAddress: documentSnapshot['trashLocationAddress'],
-      trashLocationLocation: documentSnapshot['trashLocationLocation'],
       startDate: documentSnapshot['startDate'],
       returnDate: documentSnapshot['returnDate'],
       startTime: documentSnapshot['startTime'],

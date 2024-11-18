@@ -228,7 +228,7 @@ class _RecyclingCentersState extends State<RecyclingCenters> {
             Padding(
               padding: const EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
               child: Icon(
-                Icons.transfer_within_a_station_rounded,
+                Icons.restore_from_trash,
                 color: AppThemeData().secondaryColor,
                 size: 35.0,
               ),

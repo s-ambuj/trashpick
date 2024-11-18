@@ -58,8 +58,8 @@ class _NewTrashPickUpState extends State<NewTrashPickUp> {
     'Plastic & Polythene': false,
     'Glass': false,
     'Paper': false,
-    'Metal & Coconut Shell': false,
-    'Clinical Waste': false,
+    'Metal Waste': false,
+    'Medical Waste': false,
     'E-Waste': false,
   };
 
@@ -337,31 +337,43 @@ class _NewTrashPickUpState extends State<NewTrashPickUp> {
     );
   }
 
-  Future<void> uploadImagesToStorage() async {
-    try {
-      ref = firebase_storage.FirebaseStorage.instance
-          .ref()
-          //.child('Posts/$userProfileID/$postID/${Path.basename(_image.path)}');
-          .child('Trash Pick Ups/$userProfileID/$trashID/$trashID');
-      await ref.putFile(_image);
-
-      String downloadURL = await firebase_storage.FirebaseStorage.instance
-          .ref()
-          //.child('Posts/$userProfileID/$postID/${Path.basename(_image.path)}')
-          .child('Trash Pick Ups/$userProfileID/$trashID/$trashID')
-          .getDownloadURL();
-      imageURL = downloadURL.toString();
-      print("Image Uploaded to Firebase Storage!");
-      print("Image URL: " + imageURL);
-      addPostToFireStore(imageURL);
-    } catch (e) {
-      print(e.toString());
-      ifAnError();
-    }
+Future<void> uploadImagesToStorage() async {
+  if (_image == null) {
+    print("No image selected.");
+    ifAnError();
+    return;
   }
 
-  Future<void> addPostToFireStore(String trashImage) async {
-    firestoreInstance
+  try {
+    ref = firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('Trash Pick Ups/$userProfileID/$trashID/$trashID');
+    await ref.putFile(_image);
+
+    String downloadURL = await ref.getDownloadURL();
+    imageURL = downloadURL.toString();
+    print("Image Uploaded to Firebase Storage!");
+    print("Image URL: " + imageURL);
+    addPostToFireStore(imageURL);
+  } catch (e) {
+    print("Error uploading image: " + e.toString());
+    ifAnError();
+  }
+}
+
+Future<void> addPostToFireStore(String trashImage) async {
+  if (trashImage == null || trashImage.isEmpty) {
+    print("Error: trashImage is null or empty.");
+    sendErrorCode("Image URL is null or empty.");
+    return;
+  }
+
+  try {
+    print("Adding post to Firestore...");
+    print("UserProfileID: $userProfileID");
+    print("TrashID: $trashID");
+
+    await firestoreInstance
         .collection('Users')
         .doc(userProfileID)
         .collection('Trash Pick Ups')
@@ -373,19 +385,22 @@ class _NewTrashPickUpState extends State<NewTrashPickUp> {
           'trashDescription': _trashDescriptionController.text,
           'trashImage': trashImage,
           'trashTypes': trashTypes,
-          'trashLocationAddress': trashLocationAddress,
-          'trashLocationLocation':
-              new GeoPoint(trashLocationLatitude, trashLocationLongitude),
+          // 'trashLocationAddress': trashLocationAddress,
+          // 'trashLocationLocation':
+          //     new GeoPoint(trashLocationLatitude, trashLocationLongitude),
           'startDate': startDate,
           'returnDate': returnDate,
           'startTime': startTime,
           'returnTime': returnTime,
-        })
-        .then(
-          (value) => sendSuccessCode(),
-        )
-        .catchError((error) => sendErrorCode(error.toString()));
+        });
+
+    print("Post added successfully.");
+    sendSuccessCode();
+  } catch (error) {
+    print("Error adding post to Firestore: " + error.toString());
+    sendErrorCode(error.toString());
   }
+}
 
   /*void validatePost() {
     if (_newPostCaptionController.text.isEmpty ||
@@ -494,8 +509,8 @@ class _NewTrashPickUpState extends State<NewTrashPickUp> {
     final DateTime newDate = await showDatePicker(
       context: context,
       initialDate: _dateR,
-      firstDate: DateTime(2017, 1),
-      lastDate: DateTime(2022, 7),
+      firstDate: DateTime(2024, 1),
+      lastDate: DateTime(2031, 7),
       helpText: 'Select a date',
     );
     if (newDate != null) {
@@ -551,8 +566,6 @@ class _NewTrashPickUpState extends State<NewTrashPickUp> {
     } else if (trashTypes.isEmpty) {
       new ToastMessages()
           .toastError("Please select at least one type", context);
-    } else if (trashLocationAddress == "No Location Selected!") {
-      new ToastMessages().toastError("Please select a location", context);
     } else if (startDate.isEmpty) {
       new ToastMessages().toastError("Please select Start Date", context);
     } else if (returnDate.isEmpty) {
@@ -569,11 +582,11 @@ class _NewTrashPickUpState extends State<NewTrashPickUp> {
       new ToastMessages().toastError(
           "Return Time cannot be early than Start Time on same day", context);
     } else {
-      printTrashPickUpDetails();
+      // printTrashPickUpDetails();
       showAlertDialog(context);
       uploadImagesToStorage();
     }
-    //printTrashPickUpDetails();
+    // printTrashPickUpDetails();
   }
 
   @override
@@ -648,12 +661,6 @@ class _NewTrashPickUpState extends State<NewTrashPickUp> {
                 onPressed: () {
                   Navigator.pop(context);
                   navigateAndDisplaySelection(context);
-/*                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            PickTrashLocation(_currentPosition)),
-                  );*/
                 },
               ),
             ],
@@ -670,46 +677,49 @@ class _NewTrashPickUpState extends State<NewTrashPickUp> {
         child: ListView(
           physics: NeverScrollableScrollPhysics(),
           children: trashTypeValues.keys.map((String key) {
-            Color color;
+            String iconPath;
             String description;
 
             switch (key) {
               case "Plastic & Polythene":
-                color = Colors.orange.shade700;
+                iconPath = 'assets/icons/plastic.png'; // Example icon path
                 description = "Plastic & Polythene";
                 break;
               case "Glass":
-                color = Colors.red;
+                iconPath = 'assets/icons/glasses.png';
                 description = "Glass";
                 break;
               case "Paper":
-                color = Colors.blue;
+                iconPath = 'assets/icons/waste.png';
                 description = "Paper";
                 break;
-              case "Metal & Coconut Shell":
-                color = Colors.black;
-                description = "Metal & Coconut Shell";
+              case "Metal Waste":
+                iconPath = 'assets/icons/waste (1).png';
+                description = "Metal Waste";
                 break;
-              case "Clinical Waste":
-                color = Colors.yellow;
-                description = "Clinical Waste";
+              case "Medical Waste":
+                iconPath = 'assets/icons/medical.png';
+                description = "Medical Waste";
                 break;
               case "E-Waste":
-                color = Colors.grey.shade200;
+                iconPath = 'assets/icons/electronic-waste.png';
                 description = "E-Waste";
                 break;
               default:
-                color = Colors.grey.shade100;
+                iconPath = 'assets/icons/icon_disposal.png';
                 description = "Other";
             }
 
-            return new CheckboxListTile(
+            return CheckboxListTile(
               secondary: Container(
-                color: color,
                 height: 30.0,
                 width: 30.0,
+                child: Image.asset(
+                  iconPath,
+                  fit: BoxFit.contain,
+                ),
               ),
-              title: new Text(key),
+              title: Text(key),
               subtitle: Text(description),
               value: trashTypeValues[key],
               onChanged: (bool value) {
@@ -722,53 +732,6 @@ class _NewTrashPickUpState extends State<NewTrashPickUp> {
         ),
       );
     }
-
-    /*Widget getMyHomeAddress(){
-      return FutureBuilder(
-        future: userReference.doc(auth.currentUser.uid).get(),
-        builder: (context, dataSnapshot) {
-          if (!dataSnapshot.hasData) {
-            _trashLocationController =
-            new TextEditingController(text: "No Location Selected!");
-            return TextFormField(
-              controller: _trashLocationController,
-              style: TextStyle(fontWeight: FontWeight.normal),
-              decoration: InputDecoration(
-                prefixIcon: Icon(
-                  Icons.home_rounded,
-                  color: Theme.of(context).iconTheme.color,
-                  size: 35.0,
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.black),
-                ),
-              ),
-              keyboardType: TextInputType.text,
-            );
-          } else {
-            UserModelClass userModelClass =
-            UserModelClass.fromDocument(dataSnapshot.data);
-            _trashLocationController =
-            new TextEditingController(text: userModelClass.homeAddress);
-            return TextFormField(
-              controller: _trashLocationController,
-              style: TextStyle(fontWeight: FontWeight.normal),
-              decoration: InputDecoration(
-                prefixIcon: Icon(
-                  Icons.home_rounded,
-                  color: Theme.of(context).iconTheme.color,
-                  size: 35.0,
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.black),
-                ),
-              ),
-              keyboardType: TextInputType.text,
-            );
-          }
-        },
-      );
-    }*/
 
     Widget trashLocation() {
       Widget widget;
@@ -984,7 +947,6 @@ class _NewTrashPickUpState extends State<NewTrashPickUp> {
                   style: TextStyle(fontWeight: FontWeight.normal),
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
-                    hintText: "Give a name to the trash",
                     labelText: 'Trash Name',
                     focusedBorder: UnderlineInputBorder(
                       borderSide: const BorderSide(color: Colors.black),
@@ -1004,7 +966,6 @@ class _NewTrashPickUpState extends State<NewTrashPickUp> {
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
                     helperText: "$charLength",
-                    hintText: "Say something about trash",
                     labelText: 'Trash Description',
                     focusedBorder: UnderlineInputBorder(
                       borderSide: const BorderSide(color: Colors.black),
@@ -1183,11 +1144,11 @@ class _NewTrashPickUpState extends State<NewTrashPickUp> {
                 MinButtonWidget(
                   onClicked: () {
                     getCheckboxItems();
-                    //printTrashPickUpDetails();
+                    printTrashPickUpDetails();
                     validatePickUp();
                   },
                   color: AppThemeData().secondaryColor,
-                  text: "OK",
+                  text: "Submit",
                 ),
                 SizedBox(
                   height: 40.0,

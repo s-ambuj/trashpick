@@ -17,20 +17,21 @@ class _SettingsUserGuideState extends State<SettingsUserGuide> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        backgroundColor: Color(0xFFB2EBF2), // Light aqua color
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_rounded,
-              color: Theme.of(context).iconTheme.color),
+          icon: Icon(Icons.arrow_back_ios_rounded, color: Colors.black),
           onPressed: () {
-            print("Go to Welcome Page");
             Navigator.pop(context);
           },
         ),
         title: Text(
           "User Guide",
-          style: Theme.of(context).textTheme.headline6,
+          style: Theme.of(context)
+              .textTheme
+              .headline6
+              .copyWith(color: Colors.black),
         ),
-        elevation: Theme.of(context).appBarTheme.elevation,
+        elevation: 2.0,
       ),
       body: SafeArea(
         child: Stack(
@@ -45,12 +46,25 @@ class _SettingsUserGuideState extends State<SettingsUserGuide> {
                 });
               },
             ),
-            isLoading
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : Stack(),
+            if (isLoading)
+              Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      Color(0xFF00796B)), // Darker aqua
+                ),
+              ),
           ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Color(0xFFB2EBF2),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            "For more help, contact support@example.com",
+            style: TextStyle(color: Colors.black, fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );

@@ -17,140 +17,68 @@ class ViewTrashDetails extends StatefulWidget {
 class _ViewTrashDetailsState extends State<ViewTrashDetails> {
   final userReference = FirebaseFirestore.instance.collection('Users');
   final FirebaseAuth auth = FirebaseAuth.instance;
+  
+  // Light aqua color palette
+  final Color lightAqua = Color(0xFFB2EBF2);
+  final Color aqua = Color(0xFF80DEEA);
+  final Color darkAqua = Color(0xFF26C6DA);
+
   List trashTypesList;
+
+  // Map to hold icons for each trash type
+  final Map<String, IconData> trashTypeIcons = {
+    "Plastic & Polythene": Icons.recycling,
+    "Glass": Icons.local_drink,
+    "Paper": Icons.description,
+    "Metal Waste": Icons.build,
+    "Medical Waste": Icons.medical_services,
+    "E-Waste": Icons.computer,
+    "Other": Icons.miscellaneous_services,
+  };
 
   Widget trashTypesFilter(TrashPickUpsModel trashPickUpsModel) {
     return Container(
       height: (trashPickUpsModel.trashTypes.length.toDouble() * 45),
       child: ListView.builder(
-          scrollDirection: Axis.vertical,
-          physics: BouncingScrollPhysics(),
-          itemCount: trashPickUpsModel.trashTypes.length,
-          itemBuilder: (BuildContext context, int index) {
-            Color trashTypeColor;
-            String trashTypeDescription;
+        scrollDirection: Axis.vertical,
+        physics: BouncingScrollPhysics(),
+        itemCount: trashPickUpsModel.trashTypes.length,
+        itemBuilder: (BuildContext context, int index) {
+          String trashType = trashPickUpsModel.trashTypes[index];
+          IconData trashTypeIcon = trashTypeIcons[trashType] ?? Icons.help; // Default icon if not found
 
-            switch (trashPickUpsModel.trashTypes[index]) {
-              case "Plastic & Polythene":
-                trashTypeColor = Colors.orange.shade700;
-                trashTypeDescription = "Plastic & Polythene";
-                break;
-              case "Glass":
-                trashTypeColor = Colors.red;
-                trashTypeDescription = "Glass";
-                break;
-              case "Paper":
-                trashTypeColor = Colors.blue;
-                trashTypeDescription = "Paper";
-                break;
-              case "Metal & Coconut Shell":
-                trashTypeColor = Colors.black;
-                trashTypeDescription = "Metal & Coconut Shell";
-                break;
-              case "Clinical Waste":
-                trashTypeColor = Colors.yellow;
-                trashTypeDescription = "Clinical Waste";
-                break;
-              case "E-Waste":
-                trashTypeColor = Colors.grey.shade200;
-                trashTypeDescription = "E-Waste";
-                break;
-              default:
-                trashTypeColor = Colors.grey.shade100;
-                trashTypeDescription = "Other";
-            }
-
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
-              child: Row(
-                children: [
-                  Container(
-                    height: 20.0,
-                    width: 20.0,
-                    color: trashTypeColor,
-                  ),
-                  SizedBox(
-                    width: 10.0,
-                  ),
-                  Text(trashPickUpsModel.trashTypes[index]),
-                ],
-              ),
-            );
-          }),
-    );
-  }
-
-  trashTitle(String title) {
-    return Text(
-      title,
-      style: TextStyle(
-          fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
-          fontWeight: FontWeight.bold),
-    );
-  }
-
-  trashDetailsData(String detailsData) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
-      child: Text(
-        detailsData,
-        style: TextStyle(
-            fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
-            fontWeight: FontWeight.normal),
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
+            child: Row(
+              children: [
+                Icon(
+                  trashTypeIcon,
+                  size: 20.0,
+                  color: darkAqua, // You can adjust icon color here
+                ),
+                SizedBox(width: 10.0),
+                Text(trashType, style: TextStyle(color: Colors.black)),
+              ],
+            ),
+          );
+        }
       ),
     );
   }
 
-  trashAvailableDatesTimes(
-      bool isDate, String titleS, String dataS, String titleR, String dataR) {
-    IconData typeIcon;
+  TextStyle titleStyle() {
+    return TextStyle(
+      fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
+      fontWeight: FontWeight.bold,
+      color: darkAqua,
+    );
+  }
 
-    if (isDate) {
-      typeIcon = Icons.date_range_rounded;
-    } else {
-      typeIcon = Icons.access_time_rounded;
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              typeIcon,
-              size: 35.0,
-            ),
-            SizedBox(
-              width: 10.0,
-            ),
-            Column(
-              children: [
-                trashTitle(titleS),
-                trashDetailsData(dataS),
-              ],
-            ),
-          ],
-        ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              typeIcon,
-              size: 35.0,
-            ),
-            SizedBox(
-              width: 10.0,
-            ),
-            Column(
-              children: [
-                trashTitle(titleR),
-                trashDetailsData(dataR),
-              ],
-            ),
-          ],
-        ),
-      ],
+  TextStyle detailStyle() {
+    return TextStyle(
+      fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
+      fontWeight: FontWeight.normal,
+      color: Colors.black,
     );
   }
 
@@ -164,12 +92,9 @@ class _ViewTrashDetailsState extends State<ViewTrashDetails> {
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          //return profileHeaderShimmer();
           return Text(
             "Data Unavailable",
-            style: TextStyle(
-                fontSize: Theme.of(context).textTheme.headline6.fontSize,
-                fontWeight: FontWeight.bold),
+            style: titleStyle().copyWith(fontSize: 24),
           );
         } else {
           TrashPickUpsModel trashPickUpsModel =
@@ -181,13 +106,9 @@ class _ViewTrashDetailsState extends State<ViewTrashDetails> {
             children: [
               Text(
                 "${trashPickUpsModel.trashName}",
-                style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.headline5.fontSize,
-                    fontWeight: FontWeight.bold),
+                style: titleStyle().copyWith(fontSize: 26),
               ),
-              SizedBox(
-                height: 20.0,
-              ),
+              SizedBox(height: 20.0),
               ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),
                 child: Image.network(
@@ -197,56 +118,66 @@ class _ViewTrashDetailsState extends State<ViewTrashDetails> {
                   fit: BoxFit.cover,
                 ),
               ),
-              SizedBox(
-                height: 20.0,
-              ),
+              SizedBox(height: 20.0),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  trashTitle("Trash Location"),
-                  trashDetailsData(trashPickUpsModel.trashLocationAddress),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  trashTitle("Trash Description"),
-                  trashDetailsData(trashPickUpsModel.trashDescription),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  trashTitle("Trash Types"),
-                  trashDetailsData(trashPickUpsModel.trashTypes.toString()),
+                  SizedBox(height: 20.0),
+                  Text("Trash Description", style: titleStyle()),
+                  Text(trashPickUpsModel.trashDescription, style: detailStyle()),
+                  SizedBox(height: 20.0),
+                  Text("Trash Types", style: titleStyle()),
                   trashTypesFilter(trashPickUpsModel),
-                  trashAvailableDatesTimes(
-                      true,
-                      "Start Date",
-                      trashPickUpsModel.startDate,
-                      "Return Date",
-                      trashPickUpsModel.returnDate),
-                  SizedBox(
-                    height: 20.0,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Start Date", style: titleStyle()),
+                          Text(trashPickUpsModel.startDate, style: detailStyle()),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Return Date", style: titleStyle()),
+                          Text(trashPickUpsModel.returnDate, style: detailStyle()),
+                        ],
+                      ),
+                    ],
                   ),
-                  trashAvailableDatesTimes(
-                      false,
-                      "Start Time",
-                      trashPickUpsModel.startTime,
-                      "Return Time",
-                      trashPickUpsModel.returnTime),
-                  SizedBox(
-                    height: 20.0,
+                  SizedBox(height: 20.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Start Time", style: titleStyle()),
+                          Text(trashPickUpsModel.startTime, style: detailStyle()),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Return Time", style: titleStyle()),
+                          Text(trashPickUpsModel.returnTime, style: detailStyle()),
+                        ],
+                      ),
+                    ],
                   ),
-                  trashTitle("Posted Date"),
-                  trashDetailsData(trashPickUpsModel.postedDate),
-                  SizedBox(
-                    height: 20.0,
-                  ),
+                  SizedBox(height: 20.0),
+                  Text("Posted Date", style: titleStyle()),
+                  Text(trashPickUpsModel.postedDate, style: detailStyle()),
+                  SizedBox(height: 20.0),
                   Center(
                     child: widget.accountType == "Trash Picker"
                         ? MinButtonWidget(
                             text: "Edit Trash Pick Up",
-                            color: Theme.of(context).backgroundColor,
-                            onClicked: () =>
-                                {print("Edit Trash Pick Ups Pressed!")},
+                            color: aqua,
+                            onClicked: () => {print("Edit Trash Pick Ups Pressed!")},
                           )
                         : Container(),
                   ),
@@ -267,18 +198,22 @@ class _ViewTrashDetailsState extends State<ViewTrashDetails> {
         appBar: AppBar(),
         widgets: <Widget>[
           Padding(
-              padding: const EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
-              child: Image.asset(
-                "assets/icons/icon_trash_sort.png",
-                height: 35.0,
-                width: 35.0,
-              ))
+            padding: const EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
+            child: Image.asset(
+              "assets/icons/icon_trash_sort.png",
+              height: 35.0,
+              width: 35.0,
+            ),
+          )
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: trashDetails(),
+      body: Container(
+        color: lightAqua,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: trashDetails(),
+          ),
         ),
       ),
     );

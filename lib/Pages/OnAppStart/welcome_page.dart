@@ -14,48 +14,60 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppThemeData().whiteColor,
+      backgroundColor: AppThemeData().lightAqua, // Changed to light aqua
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(20.0), // Increased padding
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(height: 40),
                   Image.asset(
                     'assets/logos/trashpick_logo_banner_2.png',
-                    height: 250,
-                    width: 250,
+                    height: 200,
+                    width: 200,
                   ),
-                  SizedBox(height: 30),
-                  new ButtonWithImageWidget(
+                  SizedBox(height: 20),
+                  Text(
+                    "Welcome to TrashPick!",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppThemeData().darkAqua, // Changed text color
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ButtonWithImageWidget(
                     onClicked: () {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(builder: (context) => SignInPage()),
                         (Route<dynamic> route) => false,
                       );
-                      print("Switch to Continue with Email");
+                      print("Switch to Login");
                     },
-                    text: "Continue with Email",
+                    text: "Login to TrashPick",
                     textColor: Colors.white,
                     image: 'assets/icons/icon_email.png',
-                    color: AppThemeData().secondaryColor,
+                    color: AppThemeData().darkAqua, // Changed button color
                   ),
-                  SizedBox(height: 30),
+                  SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text("New to TrashPick ?",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          )),
+                      Text(
+                        "Create an account",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600, // Slightly lighter
+                          color: AppThemeData().darkAqua, // Changed text color
+                        ),
+                      ),
                       SizedBox(width: 10),
-                      new RadiusFlatButtonWidget(
+                      RadiusFlatButtonWidget(
                         text: "Sign Up",
                         onClicked: () {
                           Navigator.pushAndRemoveUntil(
@@ -69,6 +81,7 @@ class _WelcomePageState extends State<WelcomePage> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 40), // Extra space at the bottom
                 ],
               ),
             ),

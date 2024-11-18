@@ -21,7 +21,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final userReference = FirebaseFirestore.instance.collection('Users');
   final FirebaseAuth auth = FirebaseAuth.instance;
-  String hashTags = "#TideTunersPlasticChallage #BetterWorldFramework #Scouts";
 
   profileHeader() {
     return StreamBuilder<QuerySnapshot>(
@@ -34,8 +33,9 @@ class _SettingsPageState extends State<SettingsPage> {
           return Text(
             "Hi! ",
             style: TextStyle(
-                fontSize: Theme.of(context).textTheme.headline6.fontSize,
-                fontWeight: FontWeight.bold),
+              fontSize: Theme.of(context).textTheme.headline6.fontSize,
+              fontWeight: FontWeight.bold,
+            ),
           );
         } else {
           UserModelClass userModelClass =
@@ -43,23 +43,30 @@ class _SettingsPageState extends State<SettingsPage> {
           return Row(
             children: [
               ImageFramesWidgets().userProfileFrame(
-                  userModelClass.profileImage, 90.0, 36.0, true),
+                userModelClass.profileImage,
+                90.0,
+                36.0,
+                true,
+              ),
+              SizedBox(width: 16.0), // Increased spacing
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "${userModelClass.name}",
                     style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.headline6.fontSize,
-                        fontWeight: FontWeight.bold),
+                      fontSize: Theme.of(context).textTheme.headline6.fontSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
                   Text(
                     "${userModelClass.accountType}",
                     style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.subtitle1.fontSize,
-                        fontWeight: FontWeight.bold),
+                      fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[600], // Slightly muted color
+                    ),
                   ),
                 ],
               ),
@@ -71,46 +78,21 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   aboutUsTitle() {
-    return Row(mainAxisSize: MainAxisSize.min, children: [
-      Icon(
-        Icons.info_outline_rounded,
-        color: Theme.of(context).iconTheme.color,
-      ),
-      SizedBox(
-        width: 10.0,
-      ),
-      Text("About Us",
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.info_outline_rounded,
+          color: Theme.of(context).iconTheme.color,
+        ),
+        SizedBox(width: 10.0),
+        Text(
+          "About Us",
           style: TextStyle(
             fontSize: Theme.of(context).textTheme.button.fontSize,
             color: Theme.of(context).textTheme.button.color,
             fontWeight: FontWeight.bold,
-          ))
-    ]);
-  }
-
-  aboutUsContainer() {
-    return Column(
-      children: [
-        Text(
-          hashTags,
-          style: TextStyle(
-              fontSize: Theme.of(context).textTheme.caption.fontSize,
-              fontWeight: FontWeight.bold,
-              color: AppThemeData().deepBlueColor),
-        ),
-        SizedBox(
-          height: 10.0,
-        ),
-        Image.asset(
-          'assets/images/about_banner_1.png',
-          width: MediaQuery.of(context).size.width,
-        ),
-        SizedBox(
-          height: 5.0,
-        ),
-        Image.asset(
-          'assets/images/about_banner_2.png',
-          width: MediaQuery.of(context).size.width,
+          ),
         ),
       ],
     );
@@ -139,60 +121,49 @@ class _SettingsPageState extends State<SettingsPage> {
               color: Theme.of(context).iconTheme.color,
               size: 35.0,
             ),
-          )
+          ),
         ],
       ),
-      body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Container(
+      body: Container(
+        decoration: BoxDecoration(
+          color: Color(0xFFE1F5FE), // Light aqua background
+        ),
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 8.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 profileHeader(),
-                SizedBox(
-                  height: 20.0,
-                ),
-                TextWithIconButtonWidget(
-                  text: "Sign Out",
-                  icon: Icons.logout,
-                  iconToLeft: true,
-                  onClicked: () => SignOutAlertDialog().showAlert(context),
-                ),
-                SizedBox(
-                  height: 5.0,
-                ),
+                SizedBox(height: 440.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        Icon(themeIcon),
-                        SizedBox(
-                          width: 10.0,
-                        ),
+                        Icon(themeIcon, color: Colors.black),
+                        SizedBox(width: 10.0),
                         Text(
                           "$themeText",
                           style: TextStyle(
-                              fontSize:
-                                  Theme.of(context).textTheme.button.fontSize,
-                              fontWeight: FontWeight.bold),
+                            fontSize:
+                                Theme.of(context).textTheme.button.fontSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
                       ],
                     ),
                     ChangeThemeButtonWidget(),
                   ],
                 ),
-                SizedBox(
-                  height: 5.0,
-                ),
+                SizedBox(height: 10.0), // Adjusted spacing
                 TextWithIconButtonWidget(
-                  text: "Profile Info",
+                  text: "Profile Details",
                   icon: Icons.account_circle_rounded,
                   iconToLeft: true,
                   onClicked: () {
-                    print('Switch to Profile Info');
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -200,11 +171,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     );
                   },
                 ),
-                SizedBox(
-                  height: 15.0,
-                ),
+                SizedBox(height: 15.0),
                 TextWithIconButtonWidget(
-                  text: "User Guide",
+                  text: "User Manual",
                   icon: Icons.assistant_rounded,
                   iconToLeft: true,
                   onClicked: () {
@@ -215,15 +184,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     );
                   },
                 ),
-                SizedBox(
-                  height: 15.0,
-                ),
+                SizedBox(height: 15.0),
                 TextWithIconButtonWidget(
                   text: "Give Feedback",
                   icon: Icons.feedback_rounded,
                   iconToLeft: true,
                   onClicked: () {
-                    print('Switch to Give Feedback');
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -231,14 +197,13 @@ class _SettingsPageState extends State<SettingsPage> {
                     );
                   },
                 ),
-                SizedBox(
-                  height: 15.0,
+                SizedBox(height: 15.0),
+                TextWithIconButtonWidget(
+                  text: "Sign Out",
+                  icon: Icons.logout,
+                  iconToLeft: true,
+                  onClicked: () => SignOutAlertDialog().showAlert(context),
                 ),
-                aboutUsTitle(),
-                SizedBox(
-                  height: 15.0,
-                ),
-                aboutUsContainer(),
               ],
             ),
           ),
